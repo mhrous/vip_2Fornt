@@ -1,0 +1,1 @@
+const endPoint="https://vip2020.herokuapp.com",logIn=({data:s,success:e,error:n})=>{$.ajax({type:"POST",url:`${endPoint}/signin`,data:s,success:e,error:n})};

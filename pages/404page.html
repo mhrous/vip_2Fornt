@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>Document</title><style>body {
+        background: linear-gradient(87deg, #172b4d 0, #1a174d 100%) !important;
+      }
+      div {
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%);
+        color: #999;
+        text-align: center;
+      }
+      a {
+        color: #fff;
+      }</style></head><body><div><h1>لا يمكنك الدخول</h1><a href="#" id="back">خروج</a></div><script src="../assets/js/lib.js"></script><script>document.getElementById("back").addEventListener("click", logOut);
+      const token = sessionStorage.getItem("token");
+      const power = sessionStorage.getItem("power");
+      if (power !== "P" && power !== "D"&&token && token !== "null") {
+        changeLocation(1, "travel.html");
+      }</script></body></html>

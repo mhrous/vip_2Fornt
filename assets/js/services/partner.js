@@ -1,0 +1,1 @@
+const endPoint="https://vip2020.herokuapp.com/api/user",headers={},getPartner=({success:e})=>{$.ajax({type:"GET",url:`${endPoint}?power=P`,success:e,headers:headers})};

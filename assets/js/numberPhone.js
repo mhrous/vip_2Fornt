@@ -1,0 +1,1 @@
+$(document).ready(function(){const{token:e,power:r}=testLogin("numberPhone");renderSiteBar(),(()=>{const e=$("#driver-table").DataTable({paging:!1,searching:!1,columnDefs:[{orderable:!1,targets:1}]});getDriver({success({data:r}){r.forEach(({address:r,name:a,phone:n})=>{e.row.add([a,renderPhone(n),r]).draw(!1)})}})})()});

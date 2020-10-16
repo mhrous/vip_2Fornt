@@ -1,0 +1,1 @@
+$(document).ready(function(){const{token:e,power:n}=testLogin("notifications");renderSiteBar();$("table").DataTable({paging:!1,searching:!1})});

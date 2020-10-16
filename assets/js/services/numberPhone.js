@@ -1,0 +1,1 @@
+const endPoint="https://vip2020.herokuapp.com/api/user",headers={},getDriver=({success:e})=>{$.ajax({type:"GET",url:`${endPoint}`,success:e,headers:headers})};

@@ -1,1 +1,152 @@
-$(document).ready(function(){const{token:e,power:a}=testLogin("driver");(()=>{renderSiteBar();const{accountBulid:e}=(()=>{const e=$("#account-table").DataTable({paging:!1,searching:!1});return{accountBulid:a=>{e.clear().draw();for(let r of Object.values(a)){const a=r.name,t=r.travel.length;let n=0;r.travel.forEach(e=>{const a=e.repairing.reduce((e,a)=>e+(a.isGO?0:a.value),0),r=e.repairing.reduce((e,a)=>e+(a.isGO?a.value:0),0);0==e.cashTo&&0==r&&n++,0==e.cashBack&&0==a&&n++});const s=r.travel.reduce((e,a)=>e+(a.expenses>a.car.expensesMax?1:0),0),c=r.travel.reduce((e,a)=>e+a.repairing.length,0),d=r.travel.reduce((e,a)=>e+a.repairing.reduce((e,a)=>e+a.value,0),0),o=r.travel.reduce((e,a)=>e+a.cashTo+a.cashBack+a.repairing.reduce((e,a)=>e+a.value,0),0),u=r.travel.reduce((e,a)=>e+a.expenses,0),i=r.expenses.reduce((e,a)=>e+a.amount,0),l=r.payment.reduce((e,a)=>e+a.amount,0),p=o-u-d-l-i;e.row.add([a,t,n,s,c,d,o,u,i,l,p]).draw(!1)}}}})();(()=>{const e=$("#all-drivers-table").DataTable({paging:!1,searching:!1,columnDefs:[{orderable:!1,targets:1}]});getDriver({success({data:a}){a.forEach(({address:a,name:r,phone:t,_id:n})=>{e.row.add([`<a href="./oneDriver.html?_id=${n}">${r}</a>`,renderPhone(t),a]).draw(!1)})}})})(),MainDate=new Vue({el:"#MainDate",data:{date:moment(new Date).format("YYYY-MM"),options:{format:"YYYY-MM",useCurrent:!0}},watch:{date(a){let[r,t]=a.split("-");t=parseInt(t),r=parseInt(r),getData({m:t,y:r,success({data:a}){e(a)}})}},mounted(){let[a,r]=this.date.split("-");r=parseInt(r),a=parseInt(a),getData({m:r,y:a,success({data:a}){e(a)}})}})})()});
+$(document).ready(function() {
+  const { token, power } = testLogin("driver");
+
+  const allDriverTableInit = () => {
+    const tableNode = $("#all-drivers-table");
+
+    const tableConfig = {
+      paging: false,
+      searching: false,
+      columnDefs: [{ orderable: false, targets: 1 }]
+    };
+    const driverTable = tableNode.DataTable(tableConfig);
+
+    getDriver({
+      success({ data }) {
+        data.forEach(({ address, name, phone, _id }) => {
+          driverTable.row
+            .add([
+              `<a href="./oneDriver.html?_id=${_id}">${name}</a>`,
+              renderPhone(phone),
+              address
+            ])
+            .draw(false);
+        });
+      }
+    });
+  };
+  const accountInit = () => {
+    const tableNode = $("#account-table");
+    const tableConfig = {
+      paging: false,
+      searching: false
+    };
+    const accountTable = tableNode.DataTable(tableConfig);
+
+    const bulid = data => {
+      accountTable.clear().draw();
+
+      for (let obj of Object.values(data)) {
+        // const expensesMax = obj.expensesMax;
+
+        const name = obj.name;
+        const countTravel = obj.travel.length;
+        let ematyTravel = 0;
+        obj.travel.forEach(e => {
+          const repairingBackValue = e.repairing.reduce(
+            (a, b) => a + (b.isGO ? 0 : b.value),
+            0
+          );
+          const repairingGoValue = e.repairing.reduce(
+            (a, b) => a + (b.isGO ? b.value : 0),
+            0
+          );
+
+          if (e.cashTo == 0 && repairingGoValue == 0) ematyTravel++;
+          if (e.cashBack == 0 && repairingBackValue == 0) ematyTravel++;
+        });
+        const numberOfTavelAbofExpenseMax = obj.travel.reduce(
+          (a, b) => a + (b.expenses > b.car.expensesMax ? 1 : 0),
+          0
+        );
+        const numberRepairing = obj.travel.reduce(
+          (a, b) => a + b.repairing.length,
+          0
+        );
+        const totalRepairing = obj.travel.reduce(
+          (a, b) => a + b.repairing.reduce((_a, _b) => _a + _b.value, 0),
+          0
+        );
+        const totalTravel = obj.travel.reduce(
+          (a, b) =>
+            a +
+            b.cashTo +
+            b.cashBack +
+            b.repairing.reduce((_a, _b) => _a + _b.value, 0),
+          0
+        );
+        const totalExpenses = obj.travel.reduce((a, b) => a + b.expenses, 0);
+        const totalExpensesOnDriver = obj.expenses.reduce(
+          (a, b) => a + b.amount,
+          0
+        );
+        const totalPayment = obj.payment.reduce((a, b) => a + b.amount, 0);
+        const total =
+          totalTravel - totalExpenses -totalRepairing- totalPayment - totalExpensesOnDriver;
+        accountTable.row
+          .add([
+            name,
+            countTravel,
+            ematyTravel,
+            numberOfTavelAbofExpenseMax,
+            numberRepairing,
+            totalRepairing,
+            totalTravel,
+            totalExpenses,
+            totalExpensesOnDriver,
+            totalPayment,
+            total
+          ])
+          .draw(false);
+      }
+    };
+
+    return { accountBulid: bulid };
+  };
+
+  const start = () => {
+    renderSiteBar();
+    const { accountBulid } = accountInit();
+    allDriverTableInit();
+
+    MainDate = new Vue({
+      el: "#MainDate",
+      data: {
+        date: moment(new Date()).format("YYYY-MM"),
+        options: {
+          format: "YYYY-MM",
+          useCurrent: true
+        }
+      },
+      watch: {
+        date(val) {
+          let [y, m] = val.split("-");
+          m = parseInt(m);
+          y = parseInt(y);
+
+          getData({
+            m,
+            y,
+            success({ data }) {
+              accountBulid(data);
+            }
+          });
+        }
+      },
+      mounted() {
+        let [y, m] = this.date.split("-");
+        m = parseInt(m);
+        y = parseInt(y);
+        getData({
+          m,
+          y,
+          success({ data }) {
+
+            accountBulid(data);
+          }
+        });
+      }
+    });
+  };
+  start();
+});

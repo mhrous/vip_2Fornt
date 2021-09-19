@@ -1,1 +1,61 @@
-const endPoint="https://vip2020.herokuapp.com/api",headers={},getData=({success:e,m:s,y:a})=>{$.ajax({type:"GET",url:`${endPoint}/page/car_info?m=${s}&y=${a}`,success:e,headers:headers})},getPartnerAndDriverName=({success:e})=>{$.ajax({type:"GET",url:`${endPoint}/user/name`,success:e,headers:headers})},getCar=({success:e})=>{$.ajax({type:"GET",url:`${endPoint}/car`,success:e,headers:headers})},addCar=({data:e,success:s})=>{$.ajax({type:"POST",url:`${endPoint}/car`,success:s,data:e,headers:headers})},putCar=({id:e,data:s,success:a,error:r})=>{$.ajax({type:"PUT",url:`${endPoint}/car/${e}`,success:a,data:s,error:r,headers:headers})},deleteCar=({id:e,success:s})=>{$.ajax({type:"DELETE",url:`${endPoint}/car/${e}`,success:s,headers:headers})};
+const endPoint = "https://amyal-one.herokuapp.com/api";
+
+const headers = {};
+
+const getData = ({ success, m, y }) => {
+  $.ajax({
+    type: "GET",
+    url: `${endPoint}/page/car_info?m=${m}&y=${y}`,
+    success,
+    headers
+  });
+};
+
+const getPartnerAndDriverName = ({ success }) => {
+  $.ajax({
+    type: "GET",
+    url: `${endPoint}/user/name`,
+    success,
+    headers
+  });
+};
+
+const getCar = ({ success }) => {
+  $.ajax({
+    type: "GET",
+    url: `${endPoint}/car`,
+    success,
+    headers
+  });
+};
+
+const addCar = ({ data, success }) => {
+  $.ajax({
+    type: "POST",
+    url: `${endPoint}/car`,
+    success,
+    data,
+    headers
+  });
+};
+
+const putCar = ({ id, data, success, error }) => {
+  $.ajax({
+    type: "PUT",
+    url: `${endPoint}/car/${id}`,
+    success,
+    data,
+    error,
+    headers
+  });
+};
+
+const deleteCar = ({ id, success }) => {
+  $.ajax({
+    type: "DELETE",
+    url: `${endPoint}/car/${id}`,
+    success,
+
+    headers
+  });
+};

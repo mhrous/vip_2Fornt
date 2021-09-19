@@ -1,1 +1,321 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>سيارات</title><link rel="stylesheet" href="../assets/vendor/dataTables/css/dataTables.bootstrap4.min.css"><link rel="stylesheet" href="../assets/vendor/bootstrap-sweetalert/css/bootstrap-sweetalert.min.css"><link rel="stylesheet" href="../assets/vendor/nucleo/css/nucleo.css"><link href="../assets/vendor/argon/css/argon.min.css" rel="stylesheet"><link rel="stylesheet" href="../assets/css/vip.css"></head><body><main class="d-flex vh-100"><div id="sidebar" class="sidebar--content p-4 bg-gradient-default d-flex flex-column justify-content-between"><ul class="nav flex-column text-right p-0"></ul><div class="sidebar--footer"><button id="log-out-btn" type="button" class="btn btn-primary btn-block">تسجيل الخروج</button></div></div><div id="content" style="overflow-y:auto;" class="position-relative flex-grow-1 p-4"><div><div class="nav-wrapper row"><ul class="nav nav-pills p-0 col-9 nav-fill tap-choise flex-row" role="tablist"><li class="nav-item p-0"><a class="nav-link mb-sm-3 mb-md-0 active" data-toggle="tab" href="#all-cars" id="car_tap">كل السيارات</a></li><li class="nav-item p-0"><a class="nav-link mb-sm-3 mb-md-0" data-toggle="tab" href="#account" id="account_tap">جرد الحساب</a></li></ul><div id="MainDate" class="col-3"><div class="row float-left"><div class="col-md-12"><date-picker value="date" name="date" v-model="date" :config="options"></date-picker></div></div></div></div><div class="tab-content"><div class="tab-pane fade show active" id="all-cars"><table id="all-cars-table" class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr id="car-table-header"><th>النوع</th><th>الرقم</th><th>السائق</th><th>المصروف الاعظمي</th><th>الشركاء</th></tr></thead><tbody></tbody></table><div id="add-new-car-section"><div><button id="new-car" class="btn btn-primary">سيارة جديدة</button></div><div id="car-modal"><!-- Modal --><div class="modal fade" id="modal" role="dialog"><div class="modal-dialog modal-lg modal-dialog-scrollable"><div class="modal-content modal-lg"><div class="modal-header"><h5 class="modal-title">{{ H_.title }}</h5><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button></div><div class="modal-body"><div class="form-group row has-danger mb-3"><div class="input-group input-group-alternative"><input @keyup.enter="ok" placeholder="اسم  " type="text" class="form-control" v-model="name"></div></div><div class="form-group row has-danger mb-3"><div class="input-group input-group-alternative"><input @keyup.enter="ok" placeholder=" الرقم  " type="text" class="form-control" v-model="number"></div></div><div class="form-group has-danger row mb-3"><div class="input-group input-group-alternative"><select aria-placeholder="السائق" v-model="driver" class="form-control form-control-lg"><option value="" disabled="disabled" selected="selected">اختار السائق</option><option v-for="driver in H_.driverName" v-bind:value="driver._id">{{ driver.name }}</option></select></div></div><div class="form-group row has-danger mb-3"><div class="input-group input-group-alternative"><input @keyup.enter="ok" placeholder=" مصروف اعظمي  " min="0" step="500" type="number" class="form-control" v-model="expensesMax"></div></div><div v-for="(p, index) in partners" class="form-group has-danger row mb-3"><div :class="index==0? 'col-6':'col-5'" class="input-group input-group-alternative"><select aria-placeholder="الشريك" v-model="p.partner" class="form-control form-control-lg"><option value="" disabled="disabled" selected="selected">اختار الشريك</option><option v-for="partner in H_.partnerName" v-bind:value="partner._id">{{ partner.name }}</option></select></div><div :class="index==0? 'col-6':'col-5'" class="input-group input-group-alternative"><input @keyup.enter="ok" placeholder="حصة" type="number" min="0" max="24" step="1" class="form-control" v-model="p.value"></div><div class="col-2" v-if="index!=0"><button @click="()=>removePartner(p._id)" type="button" class="btn btn-danger"><span>&times;</span></button></div></div><div class="row mb-2"><button type="button" class="btn btn-secondary" style="margin: auto;" @click="addPartner">اضافة شريك جديد</button></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-dismiss="modal">الغاء</button> <button type="button" class="btn btn-primary" @click="ok">{{ H_.okBtnTitle }}</button></div></div></div></div></div></div></div><div class="tab-pane fade" id="account"><table id="account-table" class="table table-striped table-bordered" cellspacing="0" width="100%"><thead><tr id="table-cols"><th>النوع</th><th>الرقم</th><th>السائق</th><th>عدد السفرات</th><th>عدد السفرات الفارغة</th><th>تجاوز المصروف الاعظمي</th><th>عدد وصول الدين</th><th>اجمالي وصول الدين</th><th>اجمالي السفرات</th><th>اجمالي المصروف</th><th>اجمالي التصليح</th><th>الصافي</th></tr></thead><tbody></tbody></table></div></div></div></div></main><script src="../assets/vendor/jquery/jquery.min.js"></script><script src="../assets/vendor/bootstrap/js/bootstrap.min.js"></script><script src="../assets/vendor/bootstrap-sweetalert/js/bootstrap-sweetalert.min.js"></script><script src="../assets/vendor/dataTables/js/dataTables.min.js"></script><script src="../assets/vendor/dataTables/js/dataTables.bootstrap4.min.js"></script><script src="../assets/vendor/vue/vue.js"></script><script src="../assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script><script src="../assets/js/lib.js"></script><script src="../assets/js/services/car.js"></script><script src="../assets/js/car.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>سيارات</title>
+
+    <link
+      rel="stylesheet"
+      href="../assets/vendor/dataTables/css/dataTables.bootstrap4.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="../assets/vendor/bootstrap-sweetalert/css/bootstrap-sweetalert.min.css"
+    />
+    <link rel="stylesheet" href="../assets/vendor/nucleo/css/nucleo.css" />
+
+    <link href="../assets/vendor/argon/css/argon.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/vip.css" />
+  </head>
+
+  <body>
+    <main class="d-flex  vh-100 ">
+      <div
+        id="sidebar"
+        class="sidebar--content p-4 bg-gradient-default d-flex flex-column justify-content-between"
+      >
+        <ul class="nav flex-column  text-right p-0"></ul>
+
+        <div class="sidebar--footer">
+          <button
+            id="log-out-btn"
+            type="button"
+            class="btn btn-primary btn-block "
+          >
+            تسجيل الخروج
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="content"
+        style="overflow-y:auto ;"
+        class="position-relative flex-grow-1 p-4"
+      >
+        <div>
+          <div class="nav-wrapper row">
+            <ul
+              class="nav nav-pills p-0 col-9 nav-fill  tap-choise  flex-row"
+              role="tablist"
+            >
+              <li class="nav-item p-0">
+                <a
+                  class="nav-link mb-sm-3 mb-md-0 active"
+                  data-toggle="tab"
+                  href="#all-cars"
+                  id="car_tap"
+                >
+                  كل السيارات
+                </a>
+              </li>
+              <li class="nav-item p-0">
+                <a
+                  class="nav-link mb-sm-3 mb-md-0 "
+                  data-toggle="tab"
+                  href="#account"
+                  id="account_tap"
+                >
+                  جرد الحساب
+                </a>
+              </li>
+            </ul>
+
+            <div id="MainDate" class="col-3">
+              <div class="row float-left">
+                <div class="col-md-12">
+                  <date-picker
+                    value="date"
+                    name="date"
+                    v-model="date"
+                    :config="options"
+                  ></date-picker>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content">
+            <div class="tab-pane fade  show active " id="all-cars">
+              <table
+                id="all-cars-table"
+                class="table table-striped table-bordered"
+                cellspacing="0"
+                width="100%"
+              >
+                <thead>
+                  <tr id="car-table-header">
+                    <th>النوع</th>
+                    <th>الرقم</th>
+                    <th>السائق</th>
+                    <th>المصروف الاعظمي</th>
+                    <th>الشركاء</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+
+              <div id="add-new-car-section">
+                <div>
+                  <button id="new-car" class="btn btn-primary ">
+                    سيارة جديدة
+                  </button>
+                </div>
+
+                <div id="car-modal">
+                  <!-- Modal -->
+                  <div class="modal fade " id="modal" role="dialog">
+                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                      <div class="modal-content modal-lg">
+                        <div class="modal-header">
+                          <h5 class="modal-title">
+                            {{ H_.title }}
+                          </h5>
+                          <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                          >
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="form-group row has-danger mb-3">
+                            <div class="input-group input-group-alternative">
+                              <input
+                                @keyup.enter="ok"
+                                placeholder="اسم  "
+                                type="text"
+                                class="form-control"
+                                v-model="name"
+                              />
+                            </div>
+                          </div>
+                          <div class="form-group row has-danger mb-3">
+                            <div class="input-group input-group-alternative">
+                              <input
+                                @keyup.enter="ok"
+                                placeholder=" الرقم  "
+                                type="text"
+                                class="form-control"
+                                v-model="number"
+                              />
+                            </div>
+                          </div>
+
+                          <div class="form-group has-danger row mb-3">
+                            <div class=" input-group input-group-alternative">
+                              <select
+                                aria-placeholder="السائق"
+                                v-model="driver"
+                                class="form-control form-control-lg"
+                              >
+                                <option value="" disabled selected
+                                  >اختار السائق</option
+                                >
+
+                                <option
+                                  v-for="driver in H_.driverName"
+                                  v-bind:value="driver._id"
+                                >
+                                  {{ driver.name }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div class="form-group row has-danger mb-3">
+                            <div class="input-group input-group-alternative">
+                              <input
+                                @keyup.enter="ok"
+                                placeholder=" مصروف اعظمي  "
+                                min="0"
+                                step="500"
+                                type="number"
+                                class="form-control"
+                                v-model="expensesMax"
+                              />
+                            </div>
+                          </div>
+
+                          <div
+                            v-for="(p, index) in partners"
+                            class="form-group has-danger row mb-3"
+                          >
+                            <div
+                              :class="index==0? 'col-6':'col-5'"
+                              class=" input-group input-group-alternative"
+                            >
+                              <select
+                                aria-placeholder="الشريك"
+                                v-model="p.partner"
+                                class="form-control form-control-lg"
+                              >
+                                <option value="" disabled selected
+                                  >اختار الشريك</option
+                                >
+
+                                <option
+                                  v-for="partner in H_.partnerName"
+                                  v-bind:value="partner._id"
+                                >
+                                  {{ partner.name }}
+                                </option>
+                              </select>
+                            </div>
+                            <div
+                              :class="index==0? 'col-6':'col-5'"
+                              class=" input-group input-group-alternative"
+                            >
+                              <input
+                                @keyup.enter="ok"
+                                placeholder="حصة"
+                                type="number"
+                                min="0"
+                                max="24"
+                                step="1"
+                                class="form-control"
+                                v-model="p.value"
+                              />
+                            </div>
+                            <div class="col-2" v-if="index!=0">
+                              <button
+                                @click="()=>removePartner(p._id)"
+                                type="button"
+                                class="btn btn-danger"
+                              >
+                                <span>&times;</span>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="row mb-2">
+                            <button
+                              type="button"
+                              class="btn btn-secondary "
+                              style="margin: auto;"
+                              @click="addPartner"
+                            >
+                              اضافة شريك جديد
+                            </button>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-dismiss="modal"
+                          >
+                            الغاء
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-primary"
+                            @click="ok"
+                          >
+                            {{ H_.okBtnTitle }}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="account">
+              <table
+                id="account-table"
+                class="table table-striped table-bordered"
+                cellspacing="0"
+                width="100%"
+              >
+                <thead>
+                  <tr id="table-cols">
+                    <th>النوع</th>
+                    <th>الرقم</th>
+                    <th>السائق</th>
+
+                    <th>عدد السفرات</th>
+                    <th>عدد السفرات الفارغة</th>
+                    <th>تجاوز المصروف الاعظمي</th>
+                    <th>عدد وصول الدين</th>
+                    <th>اجمالي وصول الدين</th>
+                    <th>اجمالي السفرات</th>
+                    <th>اجمالي المصروف</th>
+                    <th>اجمالي التصليح</th>
+
+                    <th>الصافي</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../assets/vendor/jquery/jquery.min.js"></script>
+    <script src="../assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../assets/vendor/bootstrap-sweetalert/js/bootstrap-sweetalert.min.js"></script>
+    <script src="../assets/vendor/dataTables/js/dataTables.min.js"></script>
+    <script src="../assets/vendor/dataTables/js/dataTables.bootstrap4.min.js"></script>
+    <script src="../assets/vendor/vue/vue.js"></script>
+    <script src="../assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="../assets/js/lib.js"></script>
+    <script src="../assets/js/services/car.js"></script>
+    <script src="../assets/js/car.js"></script>
+  </body>
+</html>

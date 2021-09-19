@@ -1,1 +1,12 @@
-const endPoint="https://vip2020.herokuapp.com/api/user",headers={},getDriver=({success:e})=>{$.ajax({type:"GET",url:`${endPoint}`,success:e,headers:headers})};
+const endPoint = "https://amyal-one.herokuapp.com/api/user";
+
+const headers = {};
+
+const getDriver = ({ success }) => {
+  $.ajax({
+    type: "GET",
+    url: `${endPoint}`,
+    success,
+    headers
+  });
+};

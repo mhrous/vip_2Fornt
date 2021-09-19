@@ -1,1 +1,468 @@
-$(document).ready(function(){const{token:e,power:a}=testLogin("onePartner");let t,n;const o={payment:[],account:[],repairing:[],expenses:[]},r=()=>{let e;const a=$("#payment-table").DataTable({paging:!1,searching:!1});$("body").on("click","#payment-table .remove-table",function(){const e=$(this).data("id"),t=a.row("#"+$(this).data("id")),n=o.payment.findIndex(a=>a._id==e);swal({title:"  هل تريد الغاء الدفعة ",type:"info",showCancelButton:!0,confirmButtonClass:"btn-danger",confirmButtonText:"نعم",cancelButtonText:"لا"},function(a){a&&deletePayment({id:e,success(){swal("حذف","","success"),t.remove().draw(),o.payment=[...o.payment.slice(0,n),...o.payment.slice(n+1)]}})})}),$("body").on("click","#payment-table .edit-table",function(){const a=$(this).data("id"),t=o.payment.find(e=>e._id==a);$("#payment-modal #modal").modal("show"),e.H_.title="تعديل  الدفعة",e.H_.edit=!0,e.H_.okBtnTitle="تعديل",e.H_.id=a,e.date=t.date,e.amount=t.amount});const r=e=>{o.payment=[...o.payment,e];const t=a.row.add([moment(e.date).format("YYYY-MM-DD"),e.amount,renderTableAction(e._id)]).draw(!1).node();$(t).attr("id",e._id)};return(()=>{e=new Vue({el:"#payment-modal #modal",data:{H_:{title:"",okBtnTitle:"",edit:null,options:{format:"YYYY-MM-DD",useCurrent:!0}},date:null,amount:null},methods:{ok(){const e=TO_JSON(this.$data);if(delete e.H_,(e=>e.amount&&e.date)(e)){if(this.H_.edit){const t=this.H_.id;putPayment({id:t,data:e,success({data:e}){(({id:e,data:t})=>{o.payment=o.payment.map(a=>a._id==e?t:a);const r=o.payment.findIndex(a=>a._id==e),d=a.row("#"+e);new Date(t.date).getMonth()==new Date(n.date).getMonth()?d.data([moment(t.date).format("YYYY-MM-DD"),t.amount,renderTableAction(t._id)]).draw(!1):(d.remove().draw(),o.payment=[...o.payment.slice(0,r),...o.payment.slice(r+1)])})({data:e,id:t})},error(e){swal({title:e.responseJSON.error,type:"info",confirmButtonText:"اعد التعبئة",closeOnConfirm:!1})}})}else e.user=t.user._id,addPayment({data:e,success({data:e}){new Date(e.date).getMonth()==new Date(n.date).getMonth()&&r(e)},error(e){swal({title:e.responseJSON.error,type:"info",confirmButtonText:"اعد التعبئة",closeOnConfirm:!1})}});$("#payment-modal #modal").modal("hide")}else swal({title:"بعض الحقول ناقصة",type:"warning",confirmButtonText:"اعد التعبئة",closeOnConfirm:!1})}}});const d=$("#new-payment"),s=$("#payment-modal #modal");d.on("click",()=>{s.modal("show"),e.H_.title="اضافة دفعة",e.H_.edit=!1,e.H_.okBtnTitle="اضافة",e.date=moment().format("YYYY-MM-DD"),e.amount=null})})(),{addPaymentToTable:r,clearPaymentTable:()=>{a.clear().draw(),o.payment=[]}}},d=()=>{const e=$("#summary"),a=o.payment.reduce((e,a)=>e+a.amount,0),t=o.expenses.reduce((e,a)=>e+a.amount,0),n=o.repairing.reduce((e,a)=>e+a.repairing.reduce((e,a)=>e+a.value,0),0),r=o.account.reduce((e,a)=>{const t=a.travel.reduce((e,a)=>e+a.cashTo+a.cashBack+a.repairing.reduce((e,a)=>e+a.value,0),0)-a.travel.reduce((e,a)=>e+a.expenses,0)-a.expenses.reduce((e,a)=>e+a.amount,0);return e+Math.round(t*(a.part/24)*100)/100},0),d=`\n    <div class="card-body" style="text-align: right;">\n    <div class="row mb-3">\n      <div class="col-9">\n        <h4 style="color:  #5e72e4; ">\n          العائد من السيارات\n        </h4>\n      </div>\n      <div class="col-3">\n        <h4 style="color:  #5e72e4; ">${r}</h4>\n      </div>\n    </div>\n    <div class="row mb-3">\n      <div class="col-9">\n        <h4 style="color:  #5e72e4; ">\n          وصول الدين التي يجب دفعها\n        </h4>\n      </div>\n      <div class="col-3">\n        <h4 style="color:  #5e72e4; ">${n}</h4>\n      </div>\n    </div>\n    <div class="row mb-3">\n      <div class="col-9">\n        <h4 style="color:  #5e72e4; ">الطلبات الخارجية</h4>\n      </div>\n      <div class="col-3 ">\n        <h4 style="color:  #5e72e4; ">${t}</h4>\n      </div>\n    </div>\n    <div class="row mb-3">\n      <div class="col-9">\n        <h4 style="color:  #5e72e4; ">الدفعات</h4>\n      </div>\n      <div class="col-3">\n        <h4 style="color:  #5e72e4; ">${a}</h4>\n      </div>\n    </div>\n  </div>\n  <div class="card-footer" style="text-align: right;">\n    <div class="row">\n      <div class="col-9">\n        <h4 style="color:  #5e72e4; ">المتبقي له</h4>\n\n      </div>\n      <div class="col-3">\n        <h4 style="color:  #5e72e4; ">${r-n-t-a}</h4>\n      </div>\n    </div>\n  </div>    \n    \n    `;e.html(d)};(()=>{renderSiteBar();const{addAccountTableToTable:e,clearAccountable:a}=(()=>{const e=$("#account-table").DataTable({paging:!1,searching:!1});return{addAccountTableToTable:a=>{o.account=[...o.account,a];const t=a.travel.reduce((e,a)=>e+a.cashTo+a.cashBack+a.repairing.reduce((e,a)=>e+a.value,0),0),n=a.travel.reduce((e,a)=>e+a.expenses,0),r=a.expenses.reduce((e,a)=>e+a.amount,0),d=t-n-r,s=Math.round(d*(a.part/24)*100)/100,l=e.row.add([a.carName,a.carNaumber,a.part,a.driverName,a.travel.length,t,n,r,d,s]).draw(!1).node();$(l).attr("id",a._id)},clearAccountable:()=>{e.clear().draw(),o.account=[]}}})(),{addRepairingToTable:s,clearRepairingTable:l}=(()=>{const e=$("#repairing-table").DataTable({paging:!1,searching:!1});return{addRepairingToTable:a=>{o.repairing=[...o.repairing,a];for(let t of a.repairing){const n=e.row.add([moment(a.date).format("YYYY-MM-DD"),a.driver.name,t.clientName||FALSE,t.clientPhone||FALSE,t.from||FALSE,t.value]).draw(!1).node();$(n).attr("id",a._id)}},clearRepairingTable:()=>{e.clear().draw(),o.repairing=[]}}})(),{addExpensesToTable:c,clearExpensesTable:i}=(()=>{const e=$("#expenses-table").DataTable({paging:!1,searching:!1,columnDefs:[{targets:[0,,1,2],width:"75px"}]});return{addExpensesToTable:a=>{o.expenses=[...o.expenses,a];const t=e.row.add([a.driver.name,moment(a.date).format("YYYY-MM-DD"),a.amount,a.reason]).draw(!1).node();$(t).attr("id",a._id)},clearExpensesTable:()=>{e.clear().draw(),o.expenses=[]}}})(),{addPaymentToTable:m,clearPaymentTable:u}=r();t=new Vue({el:"#user",data:{user:{name:""}}}),n=new Vue({el:"#MainDate",data:{date:moment(new Date).format("YYYY-MM"),options:{format:"YYYY-MM",useCurrent:!0}},watch:{date(t){let[n,o]=t.split("-");o=parseInt(o),n=parseInt(n),getData({m:o,y:n,success({data:{payment:t,expenses:n,repairing:o,account:r}}){a(),l(),u(),i();for(let e of t)m(e);for(let e of n)c(e);for(let e of o)s(e);for(let a of Object.values(r))e(a);d()}})}},mounted(){let[a,n]=this.date.split("-");n=parseInt(n),a=parseInt(a),getData({m:n,y:a,success({data:{payment:a,expenses:t,repairing:n,account:o}}){for(let e of a)m(e);for(let e of t)c(e);for(let e of n)s(e);for(let a of Object.values(o))e(a);d()}}),getDataConst({success({data:e}){t.user=e.user}})}})})()});
+$(document).ready(function() {
+  const { token, power } = testLogin("onePartner");
+  let user, MainDate;
+  const __DATA__ = {
+    payment: [],
+    account: [],
+    repairing: [],
+    expenses: []
+  };
+
+  const initAccount = () => {
+    const tableConfig = {
+      paging: false,
+      searching: false
+    };
+    const accountTable = $("#account-table").DataTable(tableConfig);
+    const addToAccountTable = obj => {
+      __DATA__.account = [...__DATA__.account, obj];
+      const totalTravel = obj.travel.reduce(
+        (a, obj) =>
+          a +
+          obj.cashTo +
+          obj.cashBack +
+          obj.repairing.reduce((_a, _b) => _a + _b.value, 0),
+        0
+      );
+      const totalExpenses = obj.travel.reduce((a, obj) => a + obj.expenses, 0);
+
+      const totalExpensesOnCar = obj.expenses.reduce((a, b) => a + b.amount, 0);
+      const caProduct = totalTravel - totalExpenses - totalExpensesOnCar;
+      const myValue = Math.round(caProduct * (obj.part / 24) * 100) / 100;
+      const newRow = accountTable.row
+        .add([
+          obj.carName,
+          obj.carNaumber,
+          obj.part,
+          obj.driverName,
+          obj.travel.length,
+          totalTravel,
+          totalExpenses,
+          totalExpensesOnCar,
+          caProduct,
+          myValue
+        ])
+        .draw(false)
+        .node();
+      $(newRow).attr("id", obj._id);
+    };
+    const clearTable = () => {
+      accountTable.clear().draw();
+      __DATA__.account = [];
+    };
+
+    return {
+      addAccountTableToTable: addToAccountTable,
+      clearAccountable: clearTable
+    };
+  };
+
+  const initRepairing = () => {
+    const tableConfig = {
+      paging: false,
+      searching: false
+    };
+    const repairingTable = $("#repairing-table").DataTable(tableConfig);
+    const addToRepairingTable = obj => {
+      __DATA__.repairing = [...__DATA__.repairing, obj];
+      for (let r of obj.repairing) {
+        const newRow = repairingTable.row
+          .add([
+            moment(obj.date).format("YYYY-MM-DD"),
+            obj.driver.name,
+            r.clientName || FALSE,
+            r.clientPhone || FALSE,
+            r.from || FALSE,
+            r.value
+          ])
+          .draw(false)
+          .node();
+        $(newRow).attr("id", obj._id);
+      }
+    };
+    const clearTable = () => {
+      repairingTable.clear().draw();
+      __DATA__.repairing = [];
+    };
+
+    return {
+      addRepairingToTable: addToRepairingTable,
+      clearRepairingTable: clearTable
+    };
+  };
+
+  const initExpenses = () => {
+    const tableConfig = {
+      paging: false,
+      searching: false,
+      columnDefs: [{ targets: [0, , 1, 2], width: "75px" }]
+    };
+    const expensesTable = $("#expenses-table").DataTable(tableConfig);
+
+    const addToExpensesTable = obj => {
+      __DATA__.expenses = [...__DATA__.expenses, obj];
+      const newRow = expensesTable.row
+        .add([
+          obj.driver.name,
+          moment(obj.date).format("YYYY-MM-DD"),
+          obj.amount,
+          obj.reason
+        ])
+        .draw(false)
+        .node();
+      $(newRow).attr("id", obj._id);
+    };
+    const clearTable = () => {
+      expensesTable.clear().draw();
+      __DATA__.expenses = [];
+    };
+
+    return {
+      addExpensesToTable: addToExpensesTable,
+      clearExpensesTable: clearTable
+    };
+  };
+  const initPayment = () => {
+    let vueObj;
+    const tableNode = $("#payment-table");
+    const tableConfig = {
+      paging: false,
+      searching: false
+    };
+    const paymentTable = tableNode.DataTable(tableConfig);
+
+    $("body").on("click", "#payment-table .remove-table", function() {
+      const id = $(this).data("id");
+      const row = paymentTable.row("#" + $(this).data("id"));
+      const index = __DATA__.payment.findIndex(e => e._id == id);
+      swal(
+        {
+          title: `  هل تريد الغاء الدفعة `,
+          type: "info",
+          showCancelButton: true,
+          confirmButtonClass: "btn-danger",
+          confirmButtonText: "نعم",
+          cancelButtonText: "لا"
+        },
+        function(isConfirm) {
+          if (isConfirm) {
+            deletePayment({
+              id,
+              success() {
+                swal("حذف", "", "success");
+                row.remove().draw();
+                __DATA__.payment = [
+                  ...__DATA__.payment.slice(0, index),
+                  ...__DATA__.payment.slice(index + 1)
+                ];
+              }
+            });
+          }
+        }
+      );
+    });
+    $("body").on("click", "#payment-table .edit-table", function() {
+      const id = $(this).data("id");
+      const data = __DATA__.payment.find(e => e._id == id);
+
+      $("#payment-modal #modal").modal("show");
+      vueObj.H_.title = "تعديل  الدفعة";
+      vueObj.H_.edit = true;
+      vueObj.H_.okBtnTitle = "تعديل";
+      vueObj.H_.id = id;
+      vueObj.date = data.date;
+      vueObj.amount = data.amount;
+    });
+
+    const addToPaymentTable = obj => {
+      __DATA__.payment = [...__DATA__.payment, obj];
+      const newRow = paymentTable.row
+        .add([
+          moment(obj.date).format("YYYY-MM-DD"),
+          obj.amount,
+          renderTableAction(obj._id)
+        ])
+        .draw(false)
+        .node();
+      $(newRow).attr("id", obj._id);
+    };
+
+    const editFromPaymentTable = ({ id, data }) => {
+      __DATA__.payment = __DATA__.payment.map(e => (e._id == id ? data : e));
+      const index = __DATA__.payment.findIndex(e => e._id == id);
+
+      const row = paymentTable.row("#" + id);
+      if (
+        new Date(data.date).getMonth() == new Date(MainDate.date).getMonth()
+      ) {
+        const rowNode = row
+          .data([
+            moment(data.date).format("YYYY-MM-DD"),
+            data.amount,
+            renderTableAction(data._id)
+          ])
+          .draw(false);
+      } else {
+        row.remove().draw();
+        __DATA__.payment = [
+          ...__DATA__.payment.slice(0, index),
+          ...__DATA__.payment.slice(index + 1)
+        ];
+      }
+    };
+    const clearTable = () => {
+      paymentTable.clear().draw();
+      __DATA__.payment = [];
+    };
+
+    const modalInit = () => {
+      const validUser = obj => obj.amount && obj.date;
+
+      vueObj = new Vue({
+        el: "#payment-modal #modal",
+        data: {
+          H_: {
+            title: "",
+            okBtnTitle: "",
+            edit: null,
+
+            options: {
+              format: "YYYY-MM-DD",
+              useCurrent: true
+            }
+          },
+
+          date: null,
+          amount: null
+        },
+        methods: {
+          ok() {
+            const obj = TO_JSON(this.$data);
+            delete obj.H_;
+
+            if (!validUser(obj)) {
+              swal({
+                title: "بعض الحقول ناقصة",
+                type: "warning",
+                confirmButtonText: "اعد التعبئة",
+                closeOnConfirm: false
+              });
+              return;
+            }
+            if (this.H_.edit) {
+              const id = this.H_.id;
+
+              putPayment({
+                id,
+                data: obj,
+                success({ data }) {
+                  editFromPaymentTable({ data, id });
+                },
+                error(e) {
+                  swal({
+                    title: e.responseJSON.error,
+                    type: "info",
+                    confirmButtonText: "اعد التعبئة",
+                    closeOnConfirm: false
+                  });
+                  return;
+                }
+              });
+            } else {
+              obj.user = user.user._id;
+
+              addPayment({
+                data: obj,
+                success({ data }) {
+                  if (
+                    new Date(data.date).getMonth() ==
+                    new Date(MainDate.date).getMonth()
+                  )
+                    addToPaymentTable(data);
+                },
+                error(e) {
+                  swal({
+                    title: e.responseJSON.error,
+                    type: "info",
+                    confirmButtonText: "اعد التعبئة",
+                    closeOnConfirm: false
+                  });
+                  return;
+                }
+              });
+            }
+            $("#payment-modal #modal").modal("hide");
+          }
+        }
+      });
+      const newPaymentBtn = $("#new-payment");
+      const modalNode = $("#payment-modal #modal");
+      newPaymentBtn.on("click", () => {
+        modalNode.modal("show");
+        vueObj.H_.title = "اضافة دفعة";
+        vueObj.H_.edit = false;
+        vueObj.H_.okBtnTitle = "اضافة";
+        vueObj.date = moment().format("YYYY-MM-DD");
+        vueObj.amount = null;
+      });
+    };
+    modalInit();
+    return {
+      addPaymentToTable: addToPaymentTable,
+      clearPaymentTable: clearTable
+    };
+  };
+
+  const initSummary = () => {
+    const summary = $("#summary");
+    const payment = __DATA__.payment.reduce((a, b) => a + b.amount, 0);
+    const expenses = __DATA__.expenses.reduce((a, b) => a + b.amount, 0);
+    const repairing = __DATA__.repairing.reduce(
+      (a, b) => a + b.repairing.reduce((_a, _b) => _a + _b.value, 0),
+      0
+    );
+    const account = __DATA__.account.reduce((a, b) => {
+      const totalTravel = b.travel.reduce(
+        (_a, _b) =>
+          _a +
+          _b.cashTo +
+          _b.cashBack +
+          _b.repairing.reduce((__a, __b) => __a + __b.value, 0),
+        0
+      );
+      const totalExpenses = b.travel.reduce((_a, _b) => _a + _b.expenses, 0);
+
+      const totalExpensesOnCar = b.expenses.reduce(
+        (_a, _b) => _a + _b.amount,
+        0
+      );
+      const caProduct = totalTravel - totalExpenses - totalExpensesOnCar;
+      const myValue = Math.round(caProduct * (b.part / 24) * 100) / 100;
+      return a + myValue;
+    }, 0);
+    const total = account - repairing - expenses - payment;
+
+    const str = `
+    <div class="card-body" style="text-align: right;">
+    <div class="row mb-3">
+      <div class="col-9">
+        <h4 style="color:  #5e72e4; ">
+          العائد من السيارات
+        </h4>
+      </div>
+      <div class="col-3">
+        <h4 style="color:  #5e72e4; ">${account}</h4>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-9">
+        <h4 style="color:  #5e72e4; ">
+          وصول الدين التي يجب دفعها
+        </h4>
+      </div>
+      <div class="col-3">
+        <h4 style="color:  #5e72e4; ">${repairing}</h4>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-9">
+        <h4 style="color:  #5e72e4; ">الطلبات الخارجية</h4>
+      </div>
+      <div class="col-3 ">
+        <h4 style="color:  #5e72e4; ">${expenses}</h4>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-9">
+        <h4 style="color:  #5e72e4; ">الدفعات</h4>
+      </div>
+      <div class="col-3">
+        <h4 style="color:  #5e72e4; ">${payment}</h4>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer" style="text-align: right;">
+    <div class="row">
+      <div class="col-9">
+        <h4 style="color:  #5e72e4; ">المتبقي له</h4>
+
+      </div>
+      <div class="col-3">
+        <h4 style="color:  #5e72e4; ">${total}</h4>
+      </div>
+    </div>
+  </div>    
+    
+    `;
+    summary.html(str);
+  };
+
+  const start = () => {
+    renderSiteBar();
+    const { addAccountTableToTable, clearAccountable } = initAccount();
+    const { addRepairingToTable, clearRepairingTable } = initRepairing();
+    const { addExpensesToTable, clearExpensesTable } = initExpenses();
+    const { addPaymentToTable, clearPaymentTable } = initPayment();
+    user = new Vue({
+      el: "#user",
+      data: {
+        user: { name: "" }
+      }
+    });
+    MainDate = new Vue({
+      el: "#MainDate",
+      data: {
+        date: moment(new Date()).format("YYYY-MM"),
+        options: {
+          format: "YYYY-MM",
+          useCurrent: true
+        }
+      },
+      watch: {
+        date(val) {
+          let [y, m] = val.split("-");
+          m = parseInt(m);
+          y = parseInt(y);
+
+          getData({
+            m,
+            y,
+            success({ data: { payment, expenses, repairing, account } }) {
+              clearAccountable();
+              clearRepairingTable();
+              clearPaymentTable();
+              clearExpensesTable();
+              for (let p of payment) addPaymentToTable(p);
+              for (let e of expenses) addExpensesToTable(e);
+              for (let r of repairing) addRepairingToTable(r);
+              for (let a of Object.values(account)) addAccountTableToTable(a);
+              initSummary();
+            }
+          });
+        }
+      },
+      mounted() {
+        let [y, m] = this.date.split("-");
+        m = parseInt(m);
+        y = parseInt(y);
+        getData({
+          m,
+          y,
+          success({ data: { payment, expenses, repairing, account } }) {
+            for (let p of payment) addPaymentToTable(p);
+            for (let e of expenses) addExpensesToTable(e);
+            for (let r of repairing) addRepairingToTable(r);
+            for (let a of Object.values(account)) addAccountTableToTable(a);
+            initSummary();
+          }
+        });
+        getDataConst({
+          success({ data }) {
+            user.user = data.user;
+          }
+        });
+      }
+    });
+  };
+  start();
+});

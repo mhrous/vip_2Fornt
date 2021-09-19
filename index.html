@@ -1,6 +1,90 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no"><title>تسجيل الدخول</title><link href="./assets/vendor/nucleo/css/nucleo.css" rel="stylesheet"><link href="./assets/vendor/argon/css/argon.min.css" rel="stylesheet"><style>html {
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>تسجيل الدخول</title>
+
+    <link href="./assets/vendor/nucleo/css/nucleo.css" rel="stylesheet" />
+
+    <link href="./assets/vendor/argon/css/argon.min.css" rel="stylesheet" />
+
+    <style>
+      html {
         direction: rtl;
       }
       .ni-lock-circle-open {
         cursor: pointer;
-      }</style></head><body><main class="d-flex bg-gradient-default vh-100 justify-content-center align-items-center"><div class="card bg-secondary shadow border-0" style="width: 20rem;"><div class="card-body px-lg-5 py-lg-5 text-center"><img src="./assets/img/user.svg" class="m-3" width="150" alt="user"><form id="form"><div class="form-group has-danger mb-3"><div class="input-group input-group-alternative"><div class="input-group-prepend"><span class="input-group-text"><i class="ni ni-email-83"></i></span></div><input class="form-control" placeholder="الاسم" type="text" v-model="name" autocomplete="name" required @keyup.enter="login"></div></div><div class="form-group has-danger"><div class="input-group input-group-alternative"><div class="input-group-prepend"><span class="input-group-text"><i class="ni ni-lock-circle-open" @click="showPassword = !showPassword"></i></span></div><input class="form-control" placeholder="كلمة المرور" :type='showPassword? "text":"password"' v-model="password" autocomplete="password" required @keyup.enter="login"></div></div><div class="text-center"><button type="button" @click="login" class="btn btn-primary my-2">تسجيل الدخول</button></div><div style="color:var(--danger)">{{ error }}</div></form></div></div></main><script src="./assets/vendor/jquery/jquery.min.js"></script><script src="./assets/vendor/vue/vue.min.js"></script><script src="./assets/js/lib.js"></script><script src="./assets/js/services/auth.js"></script><script src="./assets/js/loginPage.js"></script></body></html>
+      }
+    </style>
+  </head>
+
+  <body>
+    <main
+      class="d-flex bg-gradient-default vh-100 justify-content-center align-items-center"
+    >
+      <div class="card bg-secondary shadow border-0" style="width: 20rem;">
+        <div class="card-body px-lg-5 py-lg-5 text-center">
+          <img src="./assets/img/user.svg" class="m-3" width="150" alt="user" />
+          <form id="form">
+            <div class="form-group has-danger mb-3">
+              <div class="input-group input-group-alternative">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="ni ni-email-83"></i>
+                  </span>
+                </div>
+                <input
+                  class="form-control"
+                  placeholder="الاسم"
+                  type="text"
+                  v-model="name"
+                  autocomplete="name"
+                  required
+                  @keyup.enter="login"
+                />
+              </div>
+            </div>
+            <div class="form-group has-danger">
+              <div class="input-group input-group-alternative">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i
+                      class="ni ni-lock-circle-open "
+                      @click="showPassword = !showPassword"
+                    ></i>
+                  </span>
+                </div>
+                <input
+                  class="form-control "
+                  placeholder="كلمة المرور"
+                  :type='showPassword? "text":"password"'
+                  v-model="password"
+                  autocomplete="password"
+                  required
+                  @keyup.enter="login"
+                />
+              </div>
+            </div>
+
+            <div class="text-center">
+              <button type="button" @click="login" class="btn btn-primary my-2">
+                تسجيل الدخول
+              </button>
+            </div>
+            <div style="color:var(--danger)">{{ error }}</div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script src="./assets/vendor/jquery/jquery.min.js"></script>
+    <script src="./assets/vendor/vue/vue.min.js"></script>
+    <script src="./assets/js/lib.js"></script>
+    <script src="./assets/js/services/auth.js"></script>
+    <script src="./assets/js/loginPage.js"></script>
+  </body>
+</html>

@@ -1,1 +1,11 @@
-$(document).ready(function(){const{token:e,power:n}=testLogin("notifications");renderSiteBar();$("table").DataTable({paging:!1,searching:!1})});
+$(document).ready(function() {
+  const { token, power } = testLogin("notifications");
+  renderSiteBar();
+  const tableNode = $("table");
+
+  const tableConfig = {
+    paging: false,
+    searching: false
+  };
+  const driverTable = tableNode.DataTable(tableConfig);
+});

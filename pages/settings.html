@@ -1,4 +1,252 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="ie=edge"><title>اعدادت</title><link rel="stylesheet" href="../assets/vendor/bootstrap-sweetalert/css/bootstrap-sweetalert.min.css"><link href="../assets/vendor/nucleo/css/nucleo.css" rel="stylesheet"><link href="../assets/vendor/argon/css/argon.min.css" rel="stylesheet"><link rel="stylesheet" href="../assets/css/vip.css"></head><body><main class="d-flex vh-100"><div id="sidebar" class="sidebar--content p-4 bg-gradient-default d-flex flex-column justify-content-between"><ul class="nav flex-column text-right p-0"></ul><div class="sidebar--footer"><button id="log-out-btn" type="button" class="btn btn-primary btn-block">تسجيل الخروج</button></div></div><div id="content" class="position-relative flex-grow-1 p-4" style="overflow: auto;"><div class="card shadow p-4 mb-4" id="card"><div class="card-header" style="text-align: right;"><h2>المعلومات الشخصية :</h2></div><div class="card-body"><form><div class="form-group row has-danger mb-3"><label class="col-md-3 col-form-label">الاسم :</label><div class="col-md-9 col-sm-12 input-group input-group-alternative"><input @keyup.enter="ok" placeholder="اسم  " type="text" class="form-control" v-model="name"></div></div><div class="form-group row has-danger mb-3"><label class="col-md-3 col-form-label">العنوان :</label><div class="input-group col-md-9 col-sm-12 input-group-alternative"><input @keyup.enter="ok" placeholder=" عنوان  " type="text" class="form-control" v-model="address"></div></div><div class="form-group row has-danger mb-3"><label class="col-md-3 col-form-label">كلمة السر :</label><div class="col-md-9 col-sm-12 p-0"><div class="input-group row m-0 mb-3 input-group-alternative"><div class="input-group-prepend"><span class="input-group-text"><i class="ni ni-lock-circle-open" @click="H_.showPassword = !H_.showPassword"></i></span></div><input @keyup.enter="ok" placeholder=" كلمة السر  " :type='H_.showPassword? "text":"password"' class="form-control" v-model="password" autocomplete="password"></div><div class="input-group row m-0 input-group-alternative"><div class="input-group-prepend"><span class="input-group-text"><i class="ni ni-lock-circle-open" @click="H_.showNewPassword = !H_.showNewPassword"></i></span></div><input @keyup.enter="ok" placeholder="كلمة السر الجديدة اذا رغبة" :type='H_.showNewPassword? "text":"password"' class="form-control" v-model="newpPassword" autocomplete="password"></div></div></div><div class="row"><label class="col-md-3 col-form-label" style="text-align: right;">ارقام الهواتف :</label><div class="col-md-9 col-sm-12"><div v-for="(p, index) in phone" class="form-group has-danger row mb-3"><div :class="index==0? 'col-6':'col-5'" class="input-group input-group-alternative"><input @keyup.enter="ok" placeholder=" النوع" type="text" class="form-control" v-model="p.phoneType" :disabled="index==0"></div><div :class="index==0? 'col-6':'col-5'" class="input-group input-group-alternative"><input @keyup.enter="ok" placeholder="الرقم" type="text" class="form-control" v-model="p.value"></div><div class="col-2" v-if="index!=0"><button @click="()=>removePhon(p._id)" type="button" class="btn btn-danger"><span>&times;</span></button></div></div><div class="row"><button type="button" class="btn btn-secondary" style="margin: auto;" @click="newPhone">اضافة هاتف جديد</button></div></div></div></form></div><div class="card-footer"><button type="button" class="btn btn-primary" @click="ok">حفظ</button></div></div><div class="card shadow p-4" id="reports"><div class="card-header" style="text-align: right;"><h2>التقارير :</h2></div><div class="card-body" style="text-align: right;"><div class="accordion" id="accordionExample"><div class="card mb-2"><div class="card-header" style="cursor: pointer;" @click="printInfoDriver"><h3 class="mb-0"><button class="btn btn-link">معلومات السائقين</button></h3></div></div><div class="card mb-2"><div class="card-header" style="cursor: pointer;" @click="printInfoPartner"><h3 class="mb-0"><button class="btn btn-link">معلومات الشركاء</button></h3></div></div><div class="card mb-2"><div class="card-header" style="cursor: pointer;" @click="printInfoCar"><h3 class="mb-0"><button class="btn btn-link">معلومات سيارات</button></h3></div></div><!-- _________________________________________________________ --><!-- _________________________________________________________ --><!-- _________________________________________________________ --><!-- _________________________________________________________ --><!-- _________________________________________________________ --><!-- _________________________________________________________ --><!-- <div class="card mb-2">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>اعدادت</title>
+    <link
+      rel="stylesheet"
+      href="../assets/vendor/bootstrap-sweetalert/css/bootstrap-sweetalert.min.css"
+    />
+
+    <link href="../assets/vendor/nucleo/css/nucleo.css" rel="stylesheet" />
+
+    <link href="../assets/vendor/argon/css/argon.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/vip.css" />
+  </head>
+
+  <body>
+    <main class="d-flex  vh-100 ">
+      <div
+        id="sidebar"
+        class="sidebar--content p-4 bg-gradient-default d-flex flex-column justify-content-between"
+      >
+        <ul class="nav flex-column  text-right p-0"></ul>
+
+        <div class="sidebar--footer">
+          <button
+            id="log-out-btn"
+            type="button"
+            class="btn btn-primary btn-block "
+          >
+            تسجيل الخروج
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="content"
+        class="position-relative flex-grow-1 p-4 "
+        style="overflow: auto;"
+      >
+        <div class="card shadow p-4 mb-4" id="card">
+          <div class="card-header" style="text-align: right;">
+            <h2>المعلومات الشخصية :</h2>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="form-group row has-danger mb-3">
+                <label class="col-md-3  col-form-label">
+                  الاسم :
+                </label>
+
+                <div
+                  class="col-md-9 col-sm-12 input-group input-group-alternative"
+                >
+                  <input
+                    @keyup.enter="ok"
+                    placeholder="اسم  "
+                    type="text"
+                    class="form-control"
+                    v-model="name"
+                  />
+                </div>
+              </div>
+              <div class="form-group row has-danger mb-3">
+                <label class="col-md-3 col-form-label"> العنوان : </label>
+
+                <div
+                  class="input-group col-md-9 col-sm-12 input-group-alternative"
+                >
+                  <input
+                    @keyup.enter="ok"
+                    placeholder=" عنوان  "
+                    type="text"
+                    class="form-control"
+                    v-model="address"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group  row has-danger mb-3">
+                <label class="col-md-3 col-form-label"> كلمة السر : </label>
+
+                <div class=" col-md-9 col-sm-12 p-0">
+                  <div
+                    class="input-group row  m-0 mb-3   input-group-alternative"
+                  >
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i
+                          class="ni ni-lock-circle-open "
+                          @click="H_.showPassword = !H_.showPassword"
+                        ></i>
+                      </span>
+                    </div>
+                    <input
+                      @keyup.enter="ok"
+                      placeholder=" كلمة السر  "
+                      :type='H_.showPassword? "text":"password"'
+                      class="form-control"
+                      v-model="password"
+                      autocomplete="password"
+                    />
+                  </div>
+                  <div class="input-group  row m-0  input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i
+                          class="ni ni-lock-circle-open "
+                          @click="H_.showNewPassword = !H_.showNewPassword"
+                        ></i>
+                      </span>
+                    </div>
+
+                    <input
+                      @keyup.enter="ok"
+                      placeholder="كلمة السر الجديدة اذا رغبة"
+                      :type='H_.showNewPassword? "text":"password"'
+                      class="form-control"
+                      v-model="newpPassword"
+                      autocomplete="password"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <label
+                  class="col-md-3 col-form-label "
+                  style="text-align: right;"
+                >
+                  ارقام الهواتف :
+                </label>
+                <div class="col-md-9 col-sm-12">
+                  <div
+                    v-for="(p, index) in phone"
+                    class="form-group has-danger row mb-3"
+                  >
+                    <div
+                      :class="index==0? 'col-6':'col-5'"
+                      class=" input-group input-group-alternative"
+                    >
+                      <input
+                        @keyup.enter="ok"
+                        placeholder=" النوع"
+                        type="text"
+                        class="form-control"
+                        v-model="p.phoneType"
+                        :disabled="index==0"
+                      />
+                    </div>
+                    <div
+                      :class="index==0? 'col-6':'col-5'"
+                      class=" input-group input-group-alternative"
+                    >
+                      <input
+                        @keyup.enter="ok"
+                        placeholder="الرقم"
+                        type="text"
+                        class="form-control"
+                        v-model="p.value"
+                      />
+                    </div>
+                    <div class="col-2" v-if="index!=0">
+                      <button
+                        @click="()=>removePhon(p._id)"
+                        type="button"
+                        class="btn btn-danger"
+                      >
+                        <span>&times;</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <button
+                      type="button"
+                      class="btn btn-secondary "
+                      style="margin: auto;"
+                      @click="newPhone"
+                    >
+                      اضافة هاتف جديد
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="card-footer">
+            <button type="button" class="btn btn-primary" @click="ok">
+              حفظ
+            </button>
+          </div>
+        </div>
+
+        <div class="card shadow p-4" id="reports">
+          <div class="card-header" style="text-align: right;">
+            <h2>التقارير :</h2>
+          </div>
+          <div class="card-body" style="text-align: right;">
+            <div class="accordion" id="accordionExample">
+              <div class="card mb-2">
+                <div
+                  class="card-header"
+                  style="cursor: pointer;"
+                  @click="printInfoDriver"
+                >
+                  <h3 class="mb-0">
+                    <button class="btn btn-link">
+                      معلومات السائقين
+                    </button>
+                  </h3>
+                </div>
+              </div>
+              <div class="card mb-2">
+                <div
+                  class="card-header"
+                  style="cursor: pointer;"
+                  @click="printInfoPartner"
+                >
+                  <h3 class="mb-0">
+                    <button class="btn btn-link">
+                      معلومات الشركاء
+                    </button>
+                  </h3>
+                </div>
+              </div>
+
+              <div class="card mb-2">
+                <div
+                  class="card-header"
+                  style="cursor: pointer;"
+                  @click="printInfoCar"
+                >
+                  <h3 class="mb-0">
+                    <button class="btn btn-link">
+                      معلومات سيارات
+                    </button>
+                  </h3>
+                </div>
+              </div>
+
+              <!-- _________________________________________________________ -->
+              <!-- _________________________________________________________ -->
+              <!-- _________________________________________________________ -->
+              <!-- _________________________________________________________ -->
+              <!-- _________________________________________________________ -->
+              <!-- _________________________________________________________ -->
+
+              <!-- <div class="card mb-2">
                 <div
                   class="card-header"
                   style="cursor: pointer;"
@@ -62,11 +310,336 @@
                     </div>
                   </div>
                 </div>
-              </div> --><div class="card mb-2"><div class="card-header" style="cursor: pointer;" data-toggle="collapse" data-target="#c66" aria-expanded="false" aria-controls="c66" @click="reset" id="h66"><h3 class="mb-0"><button class="btn btn-link collapsed" type="button">جرد الحساب السيارات</button></h3></div><div id="c66" class="collapse" aria-labelledby="h66" data-parent="#accordionExample"><div class="card-body"><div class="row"><div class="col"><div class="row"><div class="form-group has-danger col mb-3"><div class="input-group input-group-alternative"><select v-model="mSelect" class="form-control form-control-lg"><option v-for="m in months" v-bind:value="m">{{ m }}</option></select></div></div><div class="form-group has-danger col mb-3"><div class="input-group input-group-alternative"><select v-model="ySelect" class="form-control form-control-lg"><option v-for="y in years" v-bind:value="y">{{ y }}</option></select></div></div></div></div><div class="col"><button @click="printAccountCars" class="btn btn-block btn-primary">تحميل</button></div></div></div></div></div><div class="card mb-2"><div class="card-header" style="cursor: pointer;" data-toggle="collapse" data-target="#c4" aria-expanded="false" aria-controls="c4" @click="reset" id="h4"><h3 class="mb-0"><button class="btn btn-link collapsed" type="button">جرد الحساب السائقين</button></h3></div><div id="c4" class="collapse" aria-labelledby="h4" data-parent="#accordionExample"><div class="card-body"><div class="row"><div class="col"><div class="row"><div class="form-group has-danger col mb-3"><div class="input-group input-group-alternative"><select v-model="mSelect" class="form-control form-control-lg"><option v-for="m in months" v-bind:value="m">{{ m }}</option></select></div></div><div class="form-group has-danger col mb-3"><div class="input-group input-group-alternative"><select v-model="ySelect" class="form-control form-control-lg"><option v-for="y in years" v-bind:value="y">{{ y }}</option></select></div></div></div></div><div class="col"><button class="btn btn-block btn-primary" @click="printAccountDriver">تحميل</button></div></div></div></div></div><!-- _________________________________________________________ --><!-- _________________________________________________________ --><!-- _________________________________________________________ --><!-- _________________________________________________________ --><!-- _________________________________________________________ --><!-- _________________________________________________________ --><div class="card mb-2"><div class="card-header" style="cursor: pointer;" data-toggle="collapse" data-target="#c5" aria-expanded="false" aria-controls="c5" @click="reset" id="h5"><h3 class="mb-0"><button class="btn btn-link collapsed" type="button">حساب السائق</button></h3></div><div id="c5" class="collapse" aria-labelledby="h5" data-parent="#accordionExample"><div class="card-body"><div class="row"><div class="col"><div class="row"><div class="form-group has-danger col mb-3"><div class="input-group input-group-alternative"><select aria-placeholder="السائق" v-model="sDriver" class="form-control form-control-lg"><option v-for="d in driver" v-bind:value="d._id">{{ d.name }}</option></select></div></div><div class="form-group has-danger col mb-3"><div class="input-group input-group-alternative"><select v-model="mSelect" class="form-control form-control-lg"><option v-for="m in months" v-bind:value="m">{{ m }}</option></select></div></div><div class="form-group has-danger col mb-3"><div class="input-group input-group-alternative"><select v-model="ySelect" class="form-control form-control-lg"><option v-for="y in years" v-bind:value="y">{{ y }}</option></select></div></div></div></div><div class="col"><button class="btn btn-block btn-primary" @click="printDriver">تحميل</button></div></div></div></div></div><div class="card mb-2"><div class="card-header" style="cursor: pointer;" data-toggle="collapse" data-target="#c6" aria-expanded="false" aria-controls="c6" @click="reset" id="h6"><h3 class="mb-0"><button class="btn btn-link collapsed" type="button">حساب شريك</button></h3></div><div id="c6" class="collapse" aria-labelledby="h6" data-parent="#accordionExample"><div class="card-body"><div class="row"><div class="col"><div class="row"><div class="form-group has-danger col mb-3"><div class="input-group input-group-alternative"><select aria-placeholder="السائق" v-model="sPartner" class="form-control form-control-lg"><option v-for="p in partner" v-bind:value="p._id">{{ p.name }}</option></select></div></div><div class="form-group has-danger col mb-3"><div class="input-group input-group-alternative"><select v-model="mSelect" class="form-control form-control-lg"><option v-for="m in months" v-bind:value="m">{{ m }}</option></select></div></div><div class="form-group has-danger col mb-3"><div class="input-group input-group-alternative"><select v-model="ySelect" class="form-control form-control-lg"><option v-for="y in years" v-bind:value="y">{{ y }}</option></select></div></div></div></div><div class="col"><button @click="PrintPartner" class="btn btn-block btn-primary">تحميل</button></div></div></div></div></div></div></div></div></div></main><script src="../assets/vendor/jquery/jquery.min.js"></script><script src="../assets/vendor/bootstrap-sweetalert/js/bootstrap-sweetalert.min.js"></script><script src="../assets/vendor/bootstrap/js/bootstrap.min.js"></script><script src="../assets/vendor/vue/vue.js"></script><script src="../assets/vendor/pdf/pdfMack.js"></script><script src="../assets/vendor/pdf/vfs_fonts.js"></script><script>pdfMake.fonts = {
+              </div> -->
+
+              <div class="card mb-2">
+                <div
+                  class="card-header"
+                  style="cursor: pointer;"
+                  data-toggle="collapse"
+                  data-target="#c66"
+                  aria-expanded="false"
+                  aria-controls="c66"
+                  @click="reset"
+                  id="h66"
+                >
+                  <h3 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button">
+                      جرد الحساب السيارات
+                    </button>
+                  </h3>
+                </div>
+                <div
+                  id="c66"
+                  class="collapse"
+                  aria-labelledby="h66"
+                  data-parent="#accordionExample"
+                >
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col">
+                        <div class="row">
+                          <div class="form-group has-danger col mb-3">
+                            <div class=" input-group input-group-alternative">
+                              <select
+                                v-model="mSelect"
+                                class="form-control form-control-lg"
+                              >
+                                <option v-for="m in months" v-bind:value="m">
+                                  {{ m }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-group has-danger col mb-3">
+                            <div class=" input-group input-group-alternative">
+                              <select
+                                v-model="ySelect"
+                                class="form-control form-control-lg"
+                              >
+                                <option v-for="y in years" v-bind:value="y">
+                                  {{ y }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <button
+                          @click="printAccountCars"
+                          class="btn btn-block btn-primary "
+                        >
+                          تحميل
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card mb-2">
+                <div
+                  class="card-header"
+                  style="cursor: pointer;"
+                  data-toggle="collapse"
+                  data-target="#c4"
+                  aria-expanded="false"
+                  aria-controls="c4"
+                  @click="reset"
+                  id="h4"
+                >
+                  <h3 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button">
+                      جرد الحساب السائقين
+                    </button>
+                  </h3>
+                </div>
+                <div
+                  id="c4"
+                  class="collapse"
+                  aria-labelledby="h4"
+                  data-parent="#accordionExample"
+                >
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col">
+                        <div class="row">
+                          <div class="form-group has-danger col mb-3">
+                            <div class=" input-group input-group-alternative">
+                              <select
+                                v-model="mSelect"
+                                class="form-control form-control-lg"
+                              >
+                                <option v-for="m in months" v-bind:value="m">
+                                  {{ m }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-group has-danger col mb-3">
+                            <div class=" input-group input-group-alternative">
+                              <select
+                                v-model="ySelect"
+                                class="form-control form-control-lg"
+                              >
+                                <option v-for="y in years" v-bind:value="y">
+                                  {{ y }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <button
+                          class="btn btn-block btn-primary "
+                          @click="printAccountDriver"
+                        >
+                          تحميل
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- _________________________________________________________ -->
+              <!-- _________________________________________________________ -->
+              <!-- _________________________________________________________ -->
+              <!-- _________________________________________________________ -->
+              <!-- _________________________________________________________ -->
+              <!-- _________________________________________________________ -->
+
+              <div class="card mb-2">
+                <div
+                  class="card-header"
+                  style="cursor: pointer;"
+                  data-toggle="collapse"
+                  data-target="#c5"
+                  aria-expanded="false"
+                  aria-controls="c5"
+                  @click="reset"
+                  id="h5"
+                >
+                  <h3 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button">
+                      حساب السائق
+                    </button>
+                  </h3>
+                </div>
+                <div
+                  id="c5"
+                  class="collapse"
+                  aria-labelledby="h5"
+                  data-parent="#accordionExample"
+                >
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col">
+                        <div class="row">
+                          <div class="form-group has-danger col mb-3">
+                            <div class=" input-group input-group-alternative">
+                              <select
+                                aria-placeholder="السائق"
+                                v-model="sDriver"
+                                class="form-control form-control-lg"
+                              >
+                                <option
+                                  v-for="d in driver"
+                                  v-bind:value="d._id"
+                                >
+                                  {{ d.name }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-group has-danger col mb-3">
+                            <div class=" input-group input-group-alternative">
+                              <select
+                                v-model="mSelect"
+                                class="form-control form-control-lg"
+                              >
+                                <option v-for="m in months" v-bind:value="m">
+                                  {{ m }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-group has-danger col mb-3">
+                            <div class=" input-group input-group-alternative">
+                              <select
+                                v-model="ySelect"
+                                class="form-control form-control-lg"
+                              >
+                                <option v-for="y in years" v-bind:value="y">
+                                  {{ y }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <button
+                          class="btn btn-block btn-primary "
+                          @click="printDriver"
+                        >
+                          تحميل
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card mb-2">
+                <div
+                  class="card-header"
+                  style="cursor: pointer;"
+                  data-toggle="collapse"
+                  data-target="#c6"
+                  aria-expanded="false"
+                  aria-controls="c6"
+                  @click="reset"
+                  id="h6"
+                >
+                  <h3 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button">
+                      حساب شريك
+                    </button>
+                  </h3>
+                </div>
+                <div
+                  id="c6"
+                  class="collapse"
+                  aria-labelledby="h6"
+                  data-parent="#accordionExample"
+                >
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col">
+                        <div class="row">
+                          <div class="form-group has-danger col mb-3">
+                            <div class=" input-group input-group-alternative">
+                              <select
+                                aria-placeholder="السائق"
+                                v-model="sPartner"
+                                class="form-control form-control-lg"
+                              >
+                                <option
+                                  v-for="p in partner"
+                                  v-bind:value="p._id"
+                                >
+                                  {{ p.name }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-group has-danger col mb-3">
+                            <div class=" input-group input-group-alternative">
+                              <select
+                                v-model="mSelect"
+                                class="form-control form-control-lg"
+                              >
+                                <option v-for="m in months" v-bind:value="m">
+                                  {{ m }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-group has-danger col mb-3">
+                            <div class=" input-group input-group-alternative">
+                              <select
+                                v-model="ySelect"
+                                class="form-control form-control-lg"
+                              >
+                                <option v-for="y in years" v-bind:value="y">
+                                  {{ y }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <button
+                          @click="PrintPartner"
+                          class="btn btn-block btn-primary "
+                        >
+                          تحميل
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../assets/vendor/jquery/jquery.min.js"></script>
+    <script src="../assets/vendor/bootstrap-sweetalert/js/bootstrap-sweetalert.min.js"></script>
+    <script src="../assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <script src="../assets/vendor/vue/vue.js"></script>
+    <script src="../assets/vendor/pdf/pdfMack.js"></script>
+    <script src="../assets/vendor/pdf/vfs_fonts.js"></script>
+    <script>
+      pdfMake.fonts = {
         Tajawal: {
           normal: "Tajawal-Regular.ttf",
           bold: "Tajawal-Bold.ttf",
           italics: "Tajawal-Regular.ttf",
           bolditalics: "Tajawal-Regular.ttf"
         }
-      };</script><script src="../assets/js/lib.js"></script><script src="../assets/js/services/settings.js"></script><script src="../assets/js/settings.js"></script></body></html>
+      };
+    </script>
+    <script src="../assets/js/lib.js"></script>
+    <script src="../assets/js/services/settings.js"></script>
+    <script src="../assets/js/settings.js"></script>
+  </body>
+</html>

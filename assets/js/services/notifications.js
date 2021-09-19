@@ -1,1 +1,3 @@
-const endPoint="https://vip2020.herokuapp.com/",headers={};
+const endPoint = "https://amyal-one.herokuapp.com";
+
+const headers = {};

@@ -1,1 +1,402 @@
-$(document).ready(function(){const{token:e,power:a}=testLogin("car");let t=null,r=null,n=[];const d=()=>{const e=$("#all-cars-table"),t={paging:!1,searching:!1,columnDefs:[{orderable:!1,targets:[4]},{targets:[3,1,0],width:"70px"}]};"admin"==a&&($("#car-table-header").append("<th></th>"),t.columnDefs.push({width:"50px",orderable:!1,targets:5}));const d=e.DataTable(t);$("body").on("click",".remove-table",function(){const e=$(this).data("id"),a=d.row("#"+$(this).data("id")),t=n.findIndex(a=>a._id==e);swal({title:`هل تريد حذف ${n[t].name}`,type:"info",showCancelButton:!0,confirmButtonClass:"btn-danger",confirmButtonText:"نعم",cancelButtonText:"لا"},function(r){r&&deleteCar({id:e,success(){swal("حذف","","success"),a.remove().draw(),n=[...n.slice(0,t),...n.slice(t+1)]}})})}),$("body").on("click",".edit-table",function(){const e=$(this).data("id"),a=n.find(a=>a._id==e),t=[];a.partners.forEach(({partner:e,value:a,_id:r})=>{t.push({partner:e._id,value:a,_id:r})}),$("#car-modal #modal").modal("show"),r.H_.title="تعديل سيارة",r.H_.edit=!0,r.H_.okBtnTitle="تعديل",r.H_.id=e,r.name=a.name,r.number=a.number,r.driver=a.driver._id,r.expensesMax=a.expensesMax,r.partners=t});const s=e=>{let a="<div>";return e.forEach(e=>{a+=`<div class="row mb-3">\n                    ${e.partner.name} (${e.value})\n                </div> `}),a+="</div>"},i=e=>{n=[...n,e];const t=[e.name,e.number,e.driver.name,e.expensesMax,s(e.partners)];"admin"===a&&t.push(renderTableAction(e._id));const r=d.row.add(t).draw(!1).node();$(r).attr("id",e._id)};return getCar({success({data:e}){e.forEach(e=>{i(e)})}}),{addToTable:i,editFromTable:({id:e,data:t})=>{n=n.map(a=>a._id==e?t:a);const r=d.row("#"+e),i=[t.name,t.number,t.driver.name,t.expensesMax,s(t.partners)];"admin"===a&&i.push(renderTableAction(t._id));r.data(i).draw(!1)}}},s=({addToTable:e,editFromTable:t})=>{if("admin"!=a)return void $("#add-new-car-section").addClass("hide");r=new Vue({el:"#car-modal #modal",data:{H_:{title:"",okBtnTitle:"",edit:null,driverName:[],partnerName:[]},name:"",number:"",driver:"",expensesMax:null,partners:[{partner:"",value:null,_id:(new Date).getTime()}]},methods:{ok(){const a=JSON.parse(JSON.stringify(this.$data));if(delete a.H_,(e=>{if(!(e.name&&e.number&&e.driver&&e.expensesMax&&0!=e.partners.length))return!1;for(let a of e.partners)if(!a.partner||!a.value)return!1;return!0})(a)){if(this.H_.edit){const e=this.H_.id;putCar({id:e,data:a,success({data:a}){t({data:a,id:e})},error(e){swal({title:e.responseJSON.error,type:"info",confirmButtonText:"اعد التعبئة",closeOnConfirm:!1})}})}else addCar({data:a,success({data:a}){e(a)},error(e){swal({title:e.responseJSON.error,type:"info",confirmButtonText:"اعد التعبئة",closeOnConfirm:!1})}});$("#car-modal #modal").modal("hide")}else swal({title:"بعض الحقول ناقصة",type:"warning",confirmButtonText:"اعد التعبئة",closeOnConfirm:!1})},addPartner(){this.partners=[...this.partners,{partner:"",value:0,_id:(new Date).getTime()}]},removePartner(e){this.partners=this.partners.filter(a=>a._id!==e)}}});const n=$("#new-car"),d=$("#car-modal #modal");n.on("click",()=>{d.modal("show"),r.H_.title="اضافة سيارة",r.H_.edit=!1,r.H_.okBtnTitle="اضافة",r.name="",r.number="",r.driver="",r.expensesMax=null,r.partners=[{partner:"",value:null,_id:(new Date).getTime()}]})};(()=>{renderSiteBar();const{addToTable:e,editFromTable:a}=d();s({addToTable:e,editFromTable:a});const{accountBulid:n}=(()=>{const e=$("#account-table").DataTable({paging:!1,searching:!1});return{accountBulid:a=>{e.clear().draw();for(let t of Object.values(a)){const a=t.expensesMax,r=t.name,n=t.number,d=t.driverName,s=t.travel.length;let i=0;t.travel.forEach(e=>{const a=e.repairing.reduce((e,a)=>e+(a.isGO?0:a.value),0),t=e.repairing.reduce((e,a)=>e+(a.isGO?a.value:0),0);0==e.cashTo&&0==t&&i++,0==e.cashBack&&0==a&&i++});const o=t.travel.reduce((e,t)=>e+(t.expenses>a?1:0),0),l=t.travel.reduce((e,a)=>e+a.repairing.length,0),c=t.travel.reduce((e,a)=>e+a.repairing.reduce((e,a)=>e+a.value,0),0),u=t.travel.reduce((e,a)=>e+a.cashTo+a.cashBack+a.repairing.reduce((e,a)=>e+a.value,0),0),m=t.travel.reduce((e,a)=>e+a.expenses,0),p=t.expenses.reduce((e,a)=>e+a.amount,0),h=u-m-p;e.row.add([r,n,d,s,i,o,l,c,u,m,p,h]).draw(!1)}}}})();getPartnerAndDriverName({success({data:e}){e.forEach(e=>{"D"==e.power?r.H_.driverName=[...r.H_.driverName,e]:"P"==e.power&&(r.H_.partnerName=[...r.H_.partnerName,e])})}}),t=new Vue({el:"#MainDate",data:{date:moment(new Date).format("YYYY-MM"),options:{format:"YYYY-MM",useCurrent:!0}},watch:{date(e){let[a,t]=e.split("-");t=parseInt(t),a=parseInt(a),getData({m:t,y:a,success({data:e}){n(e)}})}},mounted(){let[e,a]=this.date.split("-");a=parseInt(a),e=parseInt(e),getData({m:a,y:e,success({data:e}){n(e)}})}})})()});
+$(document).ready(function() {
+  const { token, power } = testLogin("car");
+  let MainDate = null;
+  let vueObj = null;
+  let __ALL_CAR__ = [];
+
+  const allCarTableInit = () => {
+    const tableNode = $("#all-cars-table");
+
+    const tableConfig = {
+      paging: false,
+      searching: false,
+      columnDefs: [
+        {
+          orderable: false,
+          targets: [4]
+        },
+        {
+          targets: [3, 1, 0],
+          width: "70px"
+        }
+      ]
+    };
+    if (power == "admin") {
+      $("#car-table-header").append("<th></th>");
+      tableConfig.columnDefs.push({
+        width: "50px",
+        orderable: false,
+        targets: 5
+      });
+    }
+    const carTable = tableNode.DataTable(tableConfig);
+
+    $("body").on("click", ".remove-table", function() {
+      const id = $(this).data("id");
+      const row = carTable.row("#" + $(this).data("id"));
+      const index = __ALL_CAR__.findIndex(e => e._id == id);
+      swal(
+        {
+          title: `هل تريد حذف ${__ALL_CAR__[index].name}`,
+          type: "info",
+          showCancelButton: true,
+          confirmButtonClass: "btn-danger",
+          confirmButtonText: "نعم",
+          cancelButtonText: "لا"
+        },
+        function(isConfirm) {
+          if (isConfirm) {
+            deleteCar({
+              id,
+              success() {
+                swal("حذف", "", "success");
+                row.remove().draw();
+                __ALL_CAR__ = [
+                  ...__ALL_CAR__.slice(0, index),
+                  ...__ALL_CAR__.slice(index + 1)
+                ];
+              }
+            });
+          }
+        }
+      );
+    });
+
+    $("body").on("click", ".edit-table", function() {
+      const id = $(this).data("id");
+      const data = __ALL_CAR__.find(e => e._id == id);
+
+      const partners = [];
+      data.partners.forEach(({ partner, value, _id }) => {
+        partners.push({ partner: partner._id, value, _id });
+      });
+
+      $("#car-modal #modal").modal("show");
+      vueObj.H_.title = "تعديل سيارة";
+      vueObj.H_.edit = true;
+      vueObj.H_.okBtnTitle = "تعديل";
+      vueObj.H_.id = id;
+      vueObj.name = data.name;
+      vueObj.number = data.number;
+      vueObj.driver = data.driver._id;
+      vueObj.expensesMax = data.expensesMax;
+      vueObj.partners = partners;
+    });
+
+    const renderPartner = obj => {
+      let str = "<div>";
+      obj.forEach(e => {
+        str += `<div class="row mb-3">
+                    ${e.partner.name} (${e.value})
+                </div> `;
+      });
+      str += "</div>";
+
+      return str;
+    };
+
+    const addToCarTable = obj => {
+      __ALL_CAR__ = [...__ALL_CAR__, obj];
+
+      const valueRow = [
+        obj.name,
+        obj.number,
+        obj.driver.name,
+        obj.expensesMax,
+        renderPartner(obj.partners)
+      ];
+      if (power === "admin") valueRow.push(renderTableAction(obj._id));
+      const newRow = carTable.row
+        .add(valueRow)
+        .draw(false)
+        .node();
+      $(newRow).attr("id", obj._id);
+    };
+
+    const editFromCarTable = ({ id, data }) => {
+      __ALL_CAR__ = __ALL_CAR__.map(e => (e._id == id ? data : e));
+      const row = carTable.row("#" + id);
+
+      const valueRow = [
+        data.name,
+        data.number,
+        data.driver.name,
+        data.expensesMax,
+        renderPartner(data.partners)
+      ];
+      if (power === "admin") valueRow.push(renderTableAction(data._id));
+
+      const rowNode = row.data(valueRow).draw(false);
+    };
+
+    getCar({
+      success({ data }) {
+        data.forEach(e => {
+          addToCarTable(e);
+        });
+      }
+    });
+
+    return { addToTable: addToCarTable, editFromTable: editFromCarTable };
+  };
+
+  const accountInit = () => {
+    const tableNode = $("#account-table");
+    const tableConfig = {
+      paging: false,
+      searching: false
+    };
+    const accountTable = tableNode.DataTable(tableConfig);
+
+    const bulid = data => {
+      accountTable.clear().draw();
+
+      for (let obj of Object.values(data)) {
+        const expensesMax = obj.expensesMax;
+
+        const name = obj.name;
+        const number = obj.number;
+        const driverName = obj.driverName;
+        const countTravel = obj.travel.length;
+        let ematyTravel = 0;
+        obj.travel.forEach(e => {
+          const repairingBackValue = e.repairing.reduce(
+            (a, b) => a + (b.isGO ? 0 : b.value),
+            0
+          );
+          const repairingGoValue = e.repairing.reduce(
+            (a, b) => a + (b.isGO ? b.value : 0),
+            0
+          );
+
+          if (e.cashTo == 0 && repairingGoValue == 0) ematyTravel++;
+          if (e.cashBack == 0 && repairingBackValue == 0) ematyTravel++;
+        });
+        const numberOfTavelAbofExpenseMax = obj.travel.reduce(
+          (a, b) => a + (b.expenses > expensesMax ? 1 : 0),
+          0
+        );
+        const numberRepairing = obj.travel.reduce(
+          (a, b) => a + b.repairing.length,
+          0
+        );
+        const totalRepairing = obj.travel.reduce(
+          (a, b) => a + b.repairing.reduce((_a, _b) => _a + _b.value, 0),
+          0
+        );
+        const totalTravel = obj.travel.reduce(
+          (a, b) =>
+            a +
+            b.cashTo +
+            b.cashBack +
+            b.repairing.reduce((_a, _b) => _a + _b.value, 0),
+          0
+        );
+        const totalExpenses = obj.travel.reduce((a, b) => a + b.expenses, 0);
+        const totalExpensesOnCar = obj.expenses.reduce(
+          (a, b) => a + b.amount,
+          0
+        );
+        const caProduct = totalTravel - totalExpenses - totalExpensesOnCar;
+        accountTable.row
+          .add([
+            name,
+            number,
+            driverName,
+            countTravel,
+            ematyTravel,
+            numberOfTavelAbofExpenseMax,
+            numberRepairing,
+            totalRepairing,
+            totalTravel,
+            totalExpenses,
+            totalExpensesOnCar,
+            caProduct
+          ])
+          .draw(false);
+      }
+    };
+
+    return { accountBulid: bulid };
+  };
+
+  const modalInit = ({ addToTable, editFromTable }) => {
+    if (power != "admin") {
+      $("#add-new-car-section").addClass("hide");
+      return;
+    }
+
+    const validCar = obj => {
+      if (
+        !obj.name ||
+        !obj.number ||
+        !obj.driver ||
+        !obj.expensesMax ||
+        obj.partners.length == 0
+      ) {
+        return false;
+      }
+      for (let e of obj.partners) {
+        if (!e.partner || !e.value) {
+          return false;
+        }
+      }
+
+      return true;
+    };
+
+    vueObj = new Vue({
+      el: "#car-modal #modal",
+      data: {
+        H_: {
+          title: "",
+          okBtnTitle: "",
+          edit: null,
+          driverName: [],
+          partnerName: []
+        },
+
+        name: "",
+        number: "",
+        driver: "",
+        expensesMax: null,
+        partners: [{ partner: "", value: null, _id: new Date().getTime() }]
+      },
+      methods: {
+        ok() {
+          const obj = JSON.parse(JSON.stringify(this.$data));
+          delete obj.H_;
+
+          if (!validCar(obj)) {
+            swal({
+              title: "بعض الحقول ناقصة",
+              type: "warning",
+              confirmButtonText: "اعد التعبئة",
+              closeOnConfirm: false
+            });
+            return;
+          }
+
+          if (this.H_.edit) {
+            const id = this.H_.id;
+            putCar({
+              id,
+              data: obj,
+              success({ data }) {
+                editFromTable({ data, id });
+              },
+              error(e) {
+                swal({
+                  title: e.responseJSON.error,
+                  type: "info",
+                  confirmButtonText: "اعد التعبئة",
+                  closeOnConfirm: false
+                });
+                return;
+              }
+            });
+          } else {
+            addCar({
+              data: obj,
+              success({ data }) {
+                addToTable(data);
+              },
+              error(e) {
+                swal({
+                  title: e.responseJSON.error,
+                  type: "info",
+                  confirmButtonText: "اعد التعبئة",
+                  closeOnConfirm: false
+                });
+                return;
+              }
+            });
+          }
+          $("#car-modal #modal").modal("hide");
+        },
+        addPartner() {
+          this.partners = [
+            ...this.partners,
+            { partner: "", value: 0, _id: new Date().getTime() }
+          ];
+        },
+        removePartner(_id) {
+          this.partners = this.partners.filter(e => e._id !== _id);
+        }
+      }
+    });
+
+    const newCarBtn = $("#new-car");
+    const modalNode = $("#car-modal #modal");
+    newCarBtn.on("click", () => {
+      modalNode.modal("show");
+      vueObj.H_.title = "اضافة سيارة";
+      vueObj.H_.edit = false;
+      vueObj.H_.okBtnTitle = "اضافة";
+      vueObj.name = "";
+      vueObj.number = "";
+      vueObj.driver = "";
+      vueObj.expensesMax = null;
+      vueObj.partners = [{ partner: "", value: null, _id: new Date().getTime() }];
+    });
+  };
+
+  const start = () => {
+    renderSiteBar();
+    const { addToTable, editFromTable } = allCarTableInit();
+    modalInit({ addToTable, editFromTable });
+    const { accountBulid } = accountInit();
+
+    getPartnerAndDriverName({
+      success({ data }) {
+        data.forEach(e => {
+          if (e.power == "D")
+            vueObj.H_.driverName = [...vueObj.H_.driverName, e];
+          else if (e.power == "P")
+            vueObj.H_.partnerName = [...vueObj.H_.partnerName, e];
+        });
+      }
+    });
+
+    MainDate = new Vue({
+      el: "#MainDate",
+      data: {
+        date: moment(new Date()).format("YYYY-MM"),
+        options: {
+          format: "YYYY-MM",
+          useCurrent: true
+        }
+      },
+      watch: {
+        date(val) {
+          let [y, m] = val.split("-");
+          m = parseInt(m);
+          y = parseInt(y);
+
+          getData({
+            m,
+            y,
+            success({ data }) {
+
+              accountBulid(data);
+            }
+          });
+        }
+      },
+      mounted() {
+        let [y, m] = this.date.split("-");
+        m = parseInt(m);
+        y = parseInt(y);
+        getData({
+          m,
+          y,
+          success({ data }) {
+            accountBulid(data);
+          }
+        });
+      }
+    });
+  };
+
+  start();
+});

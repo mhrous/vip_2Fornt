@@ -1,1 +1,43 @@
-const endPoint="https://vip2020.herokuapp.com/api/user",headers={},addUser=({data:e,success:s,error:r})=>{$.ajax({type:"POST",url:`${endPoint}`,data:e,success:s,error:r,headers:headers})},getUser=({success:e})=>{$.ajax({type:"GET",url:`${endPoint}`,success:e,headers:headers})},deleteUser=({id:e,success:s})=>{$.ajax({type:"DELETE",url:`${endPoint}/${e}`,success:s,headers:headers})},putUser=({id:e,data:s,success:r,error:a})=>{$.ajax({type:"PUT",url:`${endPoint}/${e}`,success:r,data:s,error:a,headers:headers})};
+const endPoint = "https://amyal-one.herokuapp.com/api/user";
+
+const headers = {};
+
+const addUser = ({ data, success, error }) => {
+  $.ajax({
+    type: "POST",
+    url: `${endPoint}`,
+    data,
+    success,
+    error,
+    headers
+  });
+};
+const getUser = ({ success }) => {
+  $.ajax({
+    type: "GET",
+    url: `${endPoint}`,
+    success,
+    headers
+  });
+};
+
+const deleteUser = ({ id, success }) => {
+  $.ajax({
+    type: "DELETE",
+    url: `${endPoint}/${id}`,
+    success,
+    headers
+  });
+};
+
+const putUser = ({ id, data, success, error }) => {
+  $.ajax({
+    type: "PUT",
+    url: `${endPoint}/${id}`,
+    success,
+    data,
+    error,
+
+    headers
+  });
+};
